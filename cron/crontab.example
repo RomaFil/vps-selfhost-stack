@@ -1,0 +1,6 @@
+# crontab -e   (all paths and names are placeholders)
+#
+# 04:30  verified backup of the app database, alert in Telegram on failure
+30 4 * * *  BACKUP_NAME=myapp DB_PATH=/data/app.db COMPOSE_DIR=$HOME/myapp SERVICE=app CHECK_TABLE=events MIN_ROWS=1 KEEP=14 NOTIFY_CMD=$HOME/vps-selfhost-stack/scripts/notify-telegram.sh $HOME/vps-selfhost-stack/scripts/sqlite-backup.sh
+# 09:00  watchdog: complain if the newest archive is older than 26 hours
+0 9 * * *   BACKUP_NAME=myapp NOTIFY_CMD=$HOME/vps-selfhost-stack/scripts/notify-telegram.sh $HOME/vps-selfhost-stack/scripts/check-backup-fresh.sh

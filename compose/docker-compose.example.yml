@@ -1,0 +1,24 @@
+# Example stack. Everything an app publishes goes on the WireGuard address only,
+# so the service does not exist from the public internet.
+#
+#   cp .env.example .env     # set WG_ADDR to the address of your wg interface
+#   docker compose up -d
+#   curl http://$WG_ADDR:8000/   # works from a machine inside the tunnel, nowhere else
+#
+# The image below is a stand-in (a plain HTTP server). Replace it with your app;
+# keep the ports line and the data volume. Not executed in this repository's tests.
+services:
+  app:
+    image: python:3.12-slim
+    command: ["python", "-m", "http.server", "8000", "--directory", "/data"]
+    restart: unless-stopped
+    ports:
+      # bound to the tunnel address, NOT to 0.0.0.0
+      - "${WG_ADDR:-10.0.0.1}:${APP_PORT:-8000}:8000"
+    volumes:
+      - ./data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

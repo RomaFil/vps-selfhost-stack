@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Test shim: pretends to be "docker compose exec -T <service> <command...>" and runs
+# the command on this machine. Lets the docker mode of sqlite-backup.sh be tested
+# without Docker. Not for real use.
+[ "${1:-}" = "compose" ] && [ "${2:-}" = "exec" ] && [ "${3:-}" = "-T" ] || { echo "shim: unsupported: $*" >&2; exit 2; }
+shift 4
+if [ "${1:-}" = "python" ]; then shift; exec python3 "$@"; fi
+exec "$@"
